@@ -20,34 +20,50 @@ function buildMetadata(sample) {
   });
 }
 
-// function to build both charts
 function buildCharts(sample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
 
-    // Get the samples field
-
-
     // Filter the samples for the object with the desired sample number
-
+    let samples = data.samples.filter(s => s.id === sample);
 
     // Get the otu_ids, otu_labels, and sample_values
-
+    let otu_ids = samples[0].otu_ids;
+    let otu_labels = samples[0].otu_labels;
+    let sample_values = samples[0].sample_values;
 
     // Build a Bubble Chart
-
-
-    // Render the Bubble Chart
-
-
-    // For the Bar Chart, map the otu_ids to a list of strings for your yticks
-
+    let bubbleLayout = {
+      title: 'Bacteria Cultures per Sample',
+      hovermode: 'closest',
+      xaxis: { title: 'OTU ID' },
+      margin: { t: 30 }
+    };
+    let bubbleData = [{
+      x: otu_ids,
+      y: sample_values,
+      text: otu_labels,
+      mode: 'markers',
+      marker: {
+        size: sample_values,
+        color: otu_ids,
+        colorscale: 'Earth'
+      }
+    }];
+    Plotly.newPlot('bubble', bubbleData, bubbleLayout);
 
     // Build a Bar Chart
-    // Don't forget to slice and reverse the input data appropriately
-
-
-    // Render the Bar Chart
-
+    let barData = [{
+      y: otu_ids.slice(0, 10).map(otuID => `OTU ${otuID}`).reverse(),
+      x: sample_values.slice(0, 10).reverse(),
+      text: otu_labels.slice(0, 10).reverse(),
+      type: 'bar',
+      orientation: 'h'
+    }];
+    let barLayout = {
+      title: 'Top 10 Bacteria Cultures Found',
+      margin: { t: 30, l: 150 }
+    };
+    Plotly.newPlot('bar', barData, barLayout);
   });
 }
 
@@ -79,7 +95,7 @@ for (let i = 0; i < names.length; i++)
 // Function for event listener
 function optionChanged(newSample) {
   // Build charts and metadata panel each time a new sample is selected
-
+  buildCharts(newSample)
 }
 
 // Initialize the dashboard
