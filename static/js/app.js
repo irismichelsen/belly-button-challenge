@@ -2,23 +2,34 @@
 function buildMetadata(sample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
 
-    // get the metadata field
-
+    console.log("sample: ", sample);
+    // Get the metadata field directly from the data object
+    let metadata = data.metadata;
+    console.log("metadata", metadata)
 
     // Filter the metadata for the object with the desired sample number
-
+    let filteredMetadata = metadata.filter(obj => obj.id == sample)[0]; // Assuming each ID is unique
+    console.log("filtered metadata: ",filteredMetadata);
 
     // Use d3 to select the panel with id of `#sample-metadata`
-
+    let div = d3.select("#sample-metadata");
 
     // Use `.html("") to clear any existing metadata
+    div.html("");
 
+    // Inside a loop, use d3 to append new tags for each key-value in the filtered metadata.
+    let formattedString = '<table>';
+    for (let key in filteredMetadata) {
+      formattedString += `<tr><td><strong>${key}: </strong></td><td>${filteredMetadata[key]}</td></tr>`;
+    }
+    formattedString += '</table>';
 
-    // Inside a loop, you will need to use d3 to append new
-    // tags for each key-value in the filtered metadata.
-
+    // Write a new metadata table to the HTML file
+    div.html(formattedString);
   });
 }
+
+
 
 function buildCharts(sample) {
   d3.json("https://static.bc-edx.com/data/dl-1-2/m14/lms/starter/samples.json").then((data) => {
@@ -95,7 +106,8 @@ for (let i = 0; i < names.length; i++)
 // Function for event listener
 function optionChanged(newSample) {
   // Build charts and metadata panel each time a new sample is selected
-  buildCharts(newSample)
+  buildCharts(newSample);
+  buildMetadata(newSample);
 }
 
 // Initialize the dashboard
